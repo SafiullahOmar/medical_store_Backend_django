@@ -1,10 +1,17 @@
 from rest_framework import serializers
-from .models import Company,CompanyBank
+from .models import Company,CompanyBank,Medicine
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model=Company
         fields="__all__"
+        
+        
+class MedicinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Medicine
+        fields="__all__"
+        
         
 class CompanyBankSerialzier(serializers.ModelSerializer):
     class Meta:

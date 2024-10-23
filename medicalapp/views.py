@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import Company,CompanyBank
-from .serializers import CompanySerializer,CompanyBankSerialzier
+from .models import Company,CompanyBank,Medicine,MedicalDetails
+from .serializers import CompanySerializer,CompanyBankSerialzier,MedicinSerializer
 from rest_framework.response     import Response 
 from rest_framework.generics import get_object_or_404,ListAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -48,7 +48,10 @@ class CompanyViewSet(viewsets.ViewSet):
         
         return Response(response_dict)
             
-       
+
+
+
+#company Bank       
        
 class CompanyBankViewSet(viewsets.ViewSet):
     authentication_classes=[JWTAuthentication]
@@ -104,7 +107,61 @@ class CompanyNameViewset(ListAPIView):
     def get_queryset(self):
         name=self.kwargs["name"]
         return Company.objects.filter(name=name)
-         
+     
+     
+     
+     
+
+
+class MedicineViewSet(viewsets.ViewSet):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+     
+     
+    def list(self,request):
+        medicine=Medicine.objects.all()
+        serializer=MedicinSerializer(medicine,many=True,context={"request":request})
+        
+        response_dict={"error":False,"message":"All Medicine  List Data","data":serializer.data}
+        return Response(response_dict)
+    
+    def create(self,request):
+        try:
+            
+            serializer=MedicinSerializer(data=request.data,context={"request":request})
+            serializer.is_valid()
+            serializer.save()
+            response_dict={"error":False,"message":"saved successfully into Medicine "}
+        except:
+            
+            response_dict={"error":True,"message":"Error while saving data"}
+        return Response(response_dict)
+    
+    def retrieve(self,request,pk=None):
+        try:
+            queryset=Medicine.objects.all()
+            medicine=get_object_or_404(queryset,pk=pk)
+            serializer=MedicinSerializer(medicine,context={"request":request})
+            return Response({"eror":None,"message":"signle data","data":serializer.data})
+        except:
+            response_dict={"error":True,"message":"Error while retriving data"}
+            return Response(response_dict)
+            
+    def update(sef,request,pk=None):
+        try:
+            queryset=Medicine.objects.all()
+            medicine=get_object_or_404(queryset,pk=pk)
+            serializer=MedicinSerializer(medicine,data=request.data,context={"request":request})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            response_dict={"error":False,"message":"updated successfully "}
+        except:
+            response_dict={"error":True,"message":"some error occured  "}
+        
+        return Response(response_dict)
+    
+    
+        
 
 company_list=CompanyViewSet.as_view({"get":"list"})
 company_create=CompanyViewSet.as_view({"post":"create"})
